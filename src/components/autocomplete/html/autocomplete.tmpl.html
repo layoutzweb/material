@@ -1,0 +1,12 @@
+<label>
+  <input type="text" ng-model="searchText" placeholder="{{placeholder}}" ng-keydown="mdCtrl.onKeydown($event)"/>
+  <a ng-if="searchText" ng-click="mdCtrl.clearValue()"> X </a>
+</label>
+<ul>
+  <li ng-repeat="(index, item) in mdCtrl.matches"
+      ng-class="{ selected: index === mdCtrl.index }"
+      ng-click="mdCtrl.select(index)"
+      ng-if="!mdCtrl.hidden && value"
+      md-highlight="{{value}}" title="{{item}}">
+  </li>
+</ul>
