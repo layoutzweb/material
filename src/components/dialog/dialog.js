@@ -273,7 +273,7 @@ function MdDialogProvider($$interimElementProvider) {
     return {
       template: [
         '<md-dialog aria-label="{{ dialog.ariaLabel }}">',
-          '<md-content>',
+          '<md-content role="document" tabIndex="0">',
             '<h2>{{ dialog.title }}</h2>',
             '<p>{{ dialog.content }}</p>',
           '</md-content>',
@@ -326,8 +326,6 @@ function MdDialogProvider($$interimElementProvider) {
       options.popInTarget = angular.element((options.targetEvent || {}).target);
       var closeButton = findCloseButton();
 
-      configureAria(element.find('md-dialog'));
-
       if (options.hasBackdrop) {
         var parentOffset = options.parent.prop('scrollTop');
         options.backdrop = angular.element('<md-backdrop class="md-dialog-backdrop md-opaque">');
@@ -335,6 +333,16 @@ function MdDialogProvider($$interimElementProvider) {
         $animate.enter(options.backdrop, options.parent);
         element.css('top', parentOffset +'px');
       }
+
+      var role = 'dialog',
+          elementToFocus = closeButton;
+
+      if (options.$type === 'alert') {
+        role = 'alertdialog';
+        elementToFocus = element.find('md-content');
+      }
+
+      configureAria(element.find('md-dialog'), role);
 
       if (options.disableParentScroll) {
         options.lastOverflow = options.parent.css('overflow');
@@ -365,7 +373,7 @@ function MdDialogProvider($$interimElementProvider) {
           };
           element.on('click', options.dialogClickOutsideCallback);
         }
-        closeButton.focus();
+        elementToFocus.focus();
       });
 
 
@@ -413,15 +421,21 @@ function MdDialogProvider($$interimElementProvider) {
     /**
      * Inject ARIA-specific attributes appropriate for Dialogs
      */
-    function configureAria(element) {
+    function configureAria(element, role) {
+
       element.attr({
-        'role': 'dialog'
+        'role': role
       });
 
       var dialogContent = element.find('md-content');
       if (dialogContent.length === 0){
         dialogContent = element;
       }
+
+      var dialogId = element.attr('id') || ('dialog_' + $mdUtil.nextUid());
+      dialogContent.attr('id', dialogId);
+      element.attr('aria-describedby', dialogId);
+
       $mdAria.expectAsync(element, 'aria-label', function() {
         var words = dialogContent.text().split(/\s+/);
         if (words.length > 3) words = words.slice(0,3).concat('...');
