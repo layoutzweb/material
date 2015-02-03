@@ -4,7 +4,7 @@
       .module('material.components.autocomplete')
       .directive('mdListItem', MdAutocomplete);
 
-  function MdAutocomplete ($compile) {
+  function MdAutocomplete ($compile, $mdUtil) {
     return {
       terminal: true,
       link: link,
@@ -14,6 +14,11 @@
       var itemName = scope.$eval(attr.mdListItem);
       scope[itemName] = scope.item;
       $compile(element.contents())(scope);
+
+      element.attr({
+        'role': 'option',
+        'id': 'item_' + $mdUtil.nextUid()
+      });
     }
   }
 })();
