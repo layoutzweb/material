@@ -30,9 +30,9 @@ ddescribe('<md-select-menu>', function() {
     }).toThrow();
   }));
   it('errors for duplicate md-options, ng-value', inject(function($rootScope) {
-    setup('ng-model="$root.model"', '<md-option ng-value="model">Hello</md-option>' +
+    setup('ng-model="$root.model"', '<md-option ng-value="foo">Hello</md-option>' +
           '<md-option ng-value="bar">Goodbye</md-option>');
-    $rootScope.$apply('model = "a"');
+    $rootScope.$apply('foo = "a"');
     expect(function() {
       $rootScope.$apply('bar = "a"');
     }).toThrow();
@@ -213,7 +213,7 @@ ddescribe('<md-select-menu>', function() {
         expect($rootScope.model).toEqual([]);
       }));
 
-      it('renders adding a value by selecting', inject(function($rootScope) {
+      it('adding a valid value to the model selects its option', inject(function($rootScope) {
         $rootScope.model = [];
         var el = setupMultiple('ng-model="$root.model"', [1,2,3,4]);
 
@@ -227,7 +227,7 @@ ddescribe('<md-select-menu>', function() {
         expect($rootScope.model).toEqual([2]);
       }));
       
-      it('renders taking a value by deselecting', inject(function($rootScope) {
+      it('removing a valid value from the model deselects its option', inject(function($rootScope) {
         $rootScope.model = [2,3];
         var el = setupMultiple('ng-model="$root.model"', [1,2,3,4]);
 
@@ -241,7 +241,7 @@ ddescribe('<md-select-menu>', function() {
         expect($rootScope.model).toEqual([3]);
       }));
 
-      it('renders emptying by deselecting all', inject(function($rootScope) {
+      it('deselects all options when setting to an empty model', inject(function($rootScope) {
         $rootScope.model = [2,3];
         var el = setupMultiple('ng-model="$root.model"', [1,2,3,4]);
 
@@ -254,7 +254,7 @@ ddescribe('<md-select-menu>', function() {
         expect($rootScope.model).toEqual([]);
       }));
 
-      it('renders adding multiple by selecting new', inject(function($rootScope) {
+      it('adding multiple valid values to a model selects their options', inject(function($rootScope) {
         $rootScope.model = [2,3];
         var el = setupMultiple('ng-model="$root.model"', [1,2,3,4]);
 
@@ -271,7 +271,7 @@ ddescribe('<md-select-menu>', function() {
         expect($rootScope.model).toEqual([2,3,1,4]);
       }));
 
-      it('renders a diff of adding and removing', inject(function($rootScope) {
+      it('correctly selects and deselects options for complete reassignment of model', inject(function($rootScope) {
         $rootScope.model = [2,4,5,6];
         var el = setupMultiple('ng-model="$root.model"', [1,2,3,4,5,6]);
 
@@ -287,17 +287,18 @@ ddescribe('<md-select-menu>', function() {
         expect($rootScope.model).toEqual([1,2,3]);
       }));
 
-      it('renders invalid values by not selecting them', inject(function($rootScope) {
+      it('does not select any options if the models value does not match an option', inject(function($rootScope) {
         $rootScope.model = [];
+        $rootScope.obj = {};
         var el = setupMultiple('ng-model="$root.model"', [1,2,3,4,5,6]);
 
         expect(selectedOptions(el).length).toBe(0);
         expect($rootScope.model).toEqual([]);
 
-        $rootScope.$apply('model = ["bar", 7]');
+        $rootScope.$apply('model = ["bar", obj]');
 
         expect(selectedOptions(el).length).toBe(0);
-        expect($rootScope.model).toEqual(["bar", 7]);
+        expect($rootScope.model).toEqual(["bar", $rootScope.obj]);
       }));
 
       it('uses track by if given to compare objects', inject(function($rootScope) {
@@ -328,7 +329,7 @@ ddescribe('<md-select-menu>', function() {
         expect(selectedOptions(el).length).toBe(0);
       }));
 
-      it('gives invalid model if value is truthy and not an array', inject(function($rootScope) {
+      it('errors the model if model value is truthy and not an array', inject(function($rootScope) {
         $rootScope.model = 'string';
         var el = setupMultiple('ng-model="$root.model"', [1,2,3]);
         var ngModelCtrl = el.controller('ngModel');
@@ -359,7 +360,7 @@ ddescribe('<md-select-menu>', function() {
         expect($rootScope.model).toEqual([]);
       }));
       
-      it('should add a deselected option to selection on click', inject(function($rootScope) {
+      it('selects a deselected option on click', inject(function($rootScope) {
         $rootScope.model = [1];
         var el = setupMultiple('ng-model="$root.model"', [1,2]);
 

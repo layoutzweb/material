@@ -14,6 +14,7 @@
 - [ ] Abstract the placement code from $mdSelect into a reusable $mdMenu service
 - [ ] Finish theming
 - [ ] Abstract placement logic in $mdSelect service to $mdMenu service
+- [ ] Add element option to interimElement to avoid recompiling every time (?)
 
 **DOCUMENTATION AND DEMOS**
 
@@ -196,7 +197,7 @@ function SelectMenuDirective($parse, $mdSelect, $mdUtil, $mdTheming) {
       } else {
         self.hashGetter = function getHashValue(value) {
           if (angular.isObject(value)) {
-            return value.$$mdSelectId || (value.$$mdSelectId = ++selectNextId);
+            return '$$object_' + (value.$$mdSelectId || (value.$$mdSelectId = ++selectNextId));
           }
           return value;
         };
